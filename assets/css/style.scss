@@ -385,7 +385,8 @@ input:focus, .form-control:focus {
             label { margin-bottom: 0px; }
 
             input[type=checkbox] {
-                width: 30px!important;
+                min-width: 30px!important;
+                max-width: 30px!important;
                 position: relative;
                 top: -3px;
                 margin-right: 15px;
