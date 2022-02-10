@@ -2,6 +2,8 @@
     require "class/Url.php";
     $page = Url::getURL( 0 );
     $pathBase = URL::getBase();
+
+    $scriptFooter = '';
 ?>
 
 <!DOCTYPE html>
@@ -14,12 +16,14 @@
     <title>Fidinsiders</title>
     <link rel="shortcut icon" href="assets/images/favicon.png"/>
     <!-- styles import -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/jquery.toast.css">
     <link rel="stylesheet" href="assets/css/style.css">
 
     <!-- scripts import -->
-    <script src="assets/js/vue-dev.js"></script> <!-- desabilitar quando estiver em prod -->
-    <!-- <script src="assets/js/vue-prod.js"></script>--> <!-- habilitar somente quando estiver em prod -->
+    
+    
 </head>
 <body>
 <?php
@@ -36,8 +40,13 @@
     require('_includes/_footer.php');
 ?>
 
-<script src="assets/js/jquery-3.3.1.slim.min.js"></script>
+<script src="assets/js/jquery-3.6.0.min.js"></script>
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/jquery.maskedinput.min.js"></script>
+<script src="assets/js/jquery.toast.js"></script>
+<?= $scriptFooter; ?>
+<script src="assets/js/functions.js"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
