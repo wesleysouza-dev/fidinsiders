@@ -6,7 +6,7 @@
         require('_includes/_stepsButtons.php'); 
         ?>
 
-        <form action="4.2-cadastro.php" id="form-register" class="px-2 py-5 form-register form-default">
+        <form action="4.3-cadastro" id="form-register" class="px-2 py-5 form-register form-default">
             <div class="row">
                 <div class="col-12 col-lg-6">
                     <div class="form-group">

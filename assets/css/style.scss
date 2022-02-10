@@ -375,14 +375,19 @@ input:focus, .form-control:focus {
             border: 1px solid v.$color-dark;
             padding: 25px 15px;
             margin-bottom: 35px;
+            cursor: pointer;
 
             &:last-child {
                 margin-bottom: 0;
             }
 
+            &.active {
+                background: v.$color-green-light;
+            }
+
             p { margin: 0;}
 
-            label { margin-bottom: 0px; }
+            label { margin-bottom: 0px; cursor: pointer; }
 
             input[type=checkbox] {
                 min-width: 30px!important;
@@ -400,7 +405,12 @@ input:focus, .form-control:focus {
         background: transparent;
         font-size: 30px;
         cursor: pointer;
-        margin: -36px 0 0 -5px;       
+        margin: -36px 0 0 -5px;     
+        
+        &:focus {
+            border: none;
+            outline: none;
+        }
     }
 
     .checkbox-default {
@@ -418,5 +428,11 @@ input:focus, .form-control:focus {
         &.active {
             background: url('../images/bgs/bg-topbar-logged-out.jpg') no-repeat;
         }
+    }
+}
+
+.btn.fs-24 {
+    @media (max-width: 767px) {
+        font-size: 18px!important;
     }
 }

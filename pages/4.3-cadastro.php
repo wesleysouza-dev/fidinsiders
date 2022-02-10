@@ -6,7 +6,7 @@
         require('_includes/_stepsButtons.php'); 
         ?>
 
-        <form action="4.2-cadastro" id="form-register" class="px-2 py-5 form-register form-default">
+        <form action="4.4-cadastro" id="form-register" class="px-2 py-5 form-register form-default">
             <div class="row">
                 <div class="col-12">
                     <label>INSIRA OS PARTICIPANTES DO PROJETO:*</label>
@@ -34,8 +34,8 @@
                     </div>
 
                     <div class="col-12 col-lg-1 d-flex align-items-center">
-                        <button class="btn-control-list btn-plus"><i class="bi bi-plus-circle text-success"></i></button>
-                        <button class="btn-control-list btn-minus"><i class="bi bi-dash-circle text-danger"></i></button>
+                        <button type="button" class="btn-control-list btn-plus" data-type="add"><i class="bi bi-plus-circle text-success"></i></button>
+                        <button type="button" class="btn-control-list btn-minus d-none" data-type="remove"><i class="bi bi-dash-circle text-danger"></i></button>
                     </div>
                 </div>
             </div>

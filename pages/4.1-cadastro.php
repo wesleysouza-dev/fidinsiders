@@ -6,7 +6,7 @@
         require('_includes/_stepsButtons.php'); 
         ?>
 
-        <form action="4.2-cadastro.php" id="form-register" class="px-2 py-5 form-register form-default">
+        <form action="4.2-cadastro" id="form-register" class="px-2 py-5 form-register form-default">
             <div class="row">
                 <div class="col-12 col-lg-6">
                     <div class="form-group">
@@ -132,7 +132,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="form-group">
                         <label>Crie uma senha:*</label>
-                        <input type="password" class="form-control" name="senha" required>
+                        <input type="password" class="form-control" name="senha" minlength="8" required>
                         <small class="form-text text-muted">
                             <ul class="list-style-disc mt-3 p-0 px-2 color-black">
                                 <li>Mínimo de 8 caracteres;</li>
@@ -144,7 +144,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="form-group">
                         <label>Repita a senha:*</label>
-                        <input type="password" class="form-control" name="repetir_senha" required>
+                        <input type="password" class="form-control" name="repetir_senha" minlength="8" required>
                         <small class="form-text text-muted">
                             <ul class="list-style-disc mt-3 p-0 px-2 color-black">
                                 <li>Mínimo de 8 caracteres;</li>
