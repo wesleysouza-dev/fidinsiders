@@ -229,7 +229,22 @@ $(function(){
         const result =  qtdLimit - qtd
 
         $(this).parent().find('.number-update').html(qtd)
-      
+    })
+
+    /* Expand Filter in mobile */
+
+    const expandFilter = $('.expandFilter')
+
+    expandFilter.on('click', function() {
+        const textFilter = $(this).find('span').text()
+        const content = $(this).parent().find('.content')
+
+        if (textFilter == 'Recolher Filtros') {
+            $(this).find('span').text('Exibir Filtros')
+            return content.removeClass('d-flex').addClass('d-none')
+        }
+        $(this).find('span').text('Recolher Filtros')
+        return content.removeClass('d-none').addClass('d-flex')
     })
 
 })

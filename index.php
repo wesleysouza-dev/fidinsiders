@@ -30,7 +30,13 @@
     if ( $page == null )
         $page = "home";
 
-    require('_includes/_header.php');
+        $numPage = intval(substr($page, 0, 2));
+
+        if ($numPage >= 16) {
+            require('_includes/_headerLogged.php');
+        } else {
+            require('_includes/_header.php');
+        }
       
     if( file_exists( "pages/" . $page . ".php" ) )
         require "pages/" . $page . ".php";
