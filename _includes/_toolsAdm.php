@@ -4,8 +4,9 @@
     </header>
 
     <ul class="tools-adm row align-items-stretch flex-wrap justify-content-start list-unstyled">
-        <li class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-center align-self-stretch">
-            <a href="#" class="flex-column justify-content-center flex-sm-row d-flex align-items-center px-2 px-md-4 py-3 border-1-black">
+        <!-- para dar o efeito de desativado, basta adicionar a classe "disable" no li -->
+        <li class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-center align-self-stretch <?= ($disabledTools) ?? ''; ?>">
+            <a href="<?= ($disabledTools) ? 'javascript:void(3);' : '#'; ?>" class="flex-column justify-content-center flex-sm-row d-flex align-items-center px-2 px-md-4 py-3 border-1-black">
                 <img src="assets/images/icons/visualizar-todos-projetos.png" class="mr-sm-3 ml-sm-0 d-block mx-auto"/>
                 <span class="text-center text-sm-left d-block mt-3 mt-sm-0">Visualizar todos os projetos</span>
             </a>

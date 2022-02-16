@@ -14,6 +14,9 @@
                         </div>
                     </header>
 
+                    <p class="text-danger text-center fw-600">NÃO EXISTEM EDIÇÕES EM ANDAMENTO</p>
+                    <!-- comentado -->
+                    <!--
                     <div class="table-responsive">
                         <table class="table table-bordered table-default">
                             <thead>
@@ -45,6 +48,8 @@
                             </tbody>
                         </table>
                     </div>
+                    -->
+                    <!-- fim comentado -->
                 </section>
                 <!-- end card panel -->
 
@@ -53,11 +58,16 @@
                     <header class="d-flex justify-content-md-between align-items-center flex-wrap">
                         <h6 class="my-2 pr-3 pr-md-5">Últimos projetos cadastrados na edição atual</h6>
 
+                        <!-- comentado 
                         <div class="buttons pl-0 pl-md-5 mt-2 mt-md-0 d-flex flex-wrap">
                             <a href="#" class="bg-black my-2 color-white">Ver todos os projetos</a>
-                        </div>
+                        </div>-->
                     </header>
 
+                    <p class="text-danger text-center fw-600">NÃO EXISTEM EDIÇÕES EM ANDAMENTO</p>
+
+                    <!-- comentado -->
+                    <!--
                     <div class="table-responsive">
                         <table class="table table-bordered table-default">
                             <thead>
@@ -111,11 +121,13 @@
                             </tbody>
                         </table>
                     </div>
+                    -->
+                    <!-- fim comentado -->
                 </section>
                 <!-- end card panel -->
 
                 <!-- card panel ferramentas adm -->
-                <?php require('_includes/_toolsAdm.php'); ?>
+                <?php $disabledTools = 'disable'; require('_includes/_toolsAdm.php'); ?>
                 <!-- end card panel -->
 
                 <!-- modal valores edição -->

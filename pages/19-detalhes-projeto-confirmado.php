@@ -1,5 +1,54 @@
 <main class="bg-body-2-images py-5 bg-white d-flex align-items-center">
     <div class="container">
+        <!-- tabela resumo -->
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6">
+                <header class="bg-black py-3 px-3">
+                    <h5 class="modal-title text-uppercase color-white fs-16">Detalhes do Projeto <span id="number-project">001</span> | <span id="status-project" class="text-success">Finalizado</span></h5>
+                </header>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-default">
+                        <tbody class="text-left w-auto fs-15">
+                            <tr>
+                                <td class="bg-eee"><strong>Nome do Responsável:</strong></td>
+                                <td>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>João Santos</span>
+                                        <a href="#" class="color-link fs-13 ml-3" style="max-width: 200px"  data-toggle="modal" data-target="#modalNf">Ver dados para emissão de NF</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-eee"><strong>Pagamento:</strong></td>
+                                <td><spam class="text-success">Confirmado</spam></td>
+                            </tr>
+                            <tr>
+                                <td class="bg-eee"><strong>Valor:</strong></td>
+                                <td>R$450,00</td>
+                            </tr>
+                            <tr>
+                                <td class="bg-eee"><strong>Data:</strong></td>
+                                <td>05/01/2022</td>
+                            </tr>
+                            <tr>
+                                <td class="bg-eee"><strong>Avaliação:</strong></td>
+                                <td>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="mr-2">Pendente</span>
+                                        <!-- <div class="d-flex align-items-center fs-13">
+                                            <span class="mr-2">Jurado: <b>João Silva</b></span>
+                                            <a href="#" class="color-link">Alterar</a>
+                                        </div> -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- fim tabela resumo -->
+
         <?php 
         $detalhes = true;
         $status = 'finalizado';
@@ -63,54 +112,6 @@
 
     </div>
 </main>
-
-<!-- MODAL RESUMO -->
-<div class="modal fade" id="modalDetalhesResumo" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-black">
-                <h5 class="modal-title text-uppercase color-white fs-16">Detalhes do Projeto <span id="number-project">001</span> | <span id="status-project" class="text-success">Finalizado</span></h5>
-                <button type="button" class="close color-white color-white-hover" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-default">
-                        <tbody class="text-left w-auto fs-15">
-                            <tr>
-                                <td class="bg-eee"><strong>Nome do Responsável:</strong></td>
-                                <td>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span>João Santos</span>
-                                        <a href="#" class="color-link fs-13 ml-3" style="max-width: 88px"  data-toggle="modal" data-target="#modalNf">Ver dados para emissão de NF</a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="bg-eee"><strong>Pagamento:</strong></td>
-                                <td><spam class="text-success">Confirmado</spam></td>
-                            </tr>
-                            <tr>
-                                <td class="bg-eee"><strong>Valor:</strong></td>
-                                <td>R$450,00</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-eee"><strong>Data:</strong></td>
-                                <td>05/01/2022</td>
-                            </tr>
-                            <tr>
-                                <td class="bg-eee"><strong>Avaliação:</strong></td>
-                                <td>Pendente</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- END MODAL RESUMO -->
 
 <!-- MODAL NF -->
 <div class="modal fade bd-example-modal-xl" id="modalNf" tabindex="-1" role="dialog">

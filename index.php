@@ -4,6 +4,7 @@
     $pathBase = URL::getBase();
 
     $scriptFooter = '';
+    $disableTools = false;
 ?>
 
 <!DOCTYPE html>

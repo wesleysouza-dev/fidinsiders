@@ -1,9 +1,7 @@
 <div class="row">
     <div class="col-12 d-flex flex-wrap justify-content-center position-relative">
         <?php if (isset($detalhes) && $detalhes) : ?>
-            <!-- exibe apenas no detalhes de projeto - Ex: página 18 e 19 -->
-            <a href="#" class="btn btn-small bg-black color-white d-inline-block mb-4" data-toggle="modal" data-target="#modalDetalhesResumo">Ver resumo</a>
-            <p class="w-100 text-center">Clique sobre os passos abaixo para conferir as informações enviadas pelo usuário:</p>
+            <p class="w-100 text-center mt-3">Clique sobre os passos abaixo para conferir as informações enviadas pelo usuário:</p>
             <!-- fim exibe apenas no detalhes de projeto - Ex: página 18 e 19 -->
         <?php else : ?>
         <h6 class="ff-cond fs-20 text-uppercase fw-600">Cadastro de Novo Projeto</h6>

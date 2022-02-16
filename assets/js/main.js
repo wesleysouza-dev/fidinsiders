@@ -247,4 +247,17 @@ $(function(){
         return content.removeClass('d-none').addClass('d-flex')
     })
 
+    /* Tooltip Bootstrap */
+    $('[data-toggle="tooltip"]').tooltip()
+
+    /* Checked input radio for Votes */
+
+    const groupVoteItem = $('.group-vote .item')
+
+    groupVoteItem.on('click', function() {
+        $(this).find('input').prop('checked', true)
+        $(groupVoteItem).removeClass('selected')
+        $(this).addClass('selected')
+    })
+
 })
