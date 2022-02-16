@@ -33,7 +33,7 @@
 
         $numPage = intval(substr($page, 0, 2));
 
-        if ($numPage >= 16) {
+        if ($numPage >= 10) {
             require('_includes/_headerLogged.php');
         } else {
             require('_includes/_header.php');

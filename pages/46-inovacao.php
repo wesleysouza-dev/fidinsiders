@@ -42,12 +42,7 @@
                             <!-- Buttons Voting Notes  -->
                             <?php require('_includes/_buttonsVotingNotes.php'); ?>
                             <!-- End Buttons Voting Notes  -->
-
-                            
-                            
-                            
                         </form>
-                        
                     </div>
                 </section>
                 <!-- end card avaliacao -->
