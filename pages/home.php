@@ -21,6 +21,7 @@
     <h4 class="mb-3">Painel Usuário</h4>
     <div class="list-group mb-4">
         <a href="10-painel-usuario" class="list-group-item list-group-item-action">Resumo</a>
+        <a href="11-projeto-enviado" class="list-group-item list-group-item-action">Projeto Enviado</a>
         <a href="12-usuario-atualizar-dados-pessoais" class="list-group-item list-group-item-action">Atualizar dados Pessoais</a>
         <a href="14-usuario-atualizar-senha-e-email" class="list-group-item list-group-item-action">Atualizar Senha e E-mail</a>
     </div>
