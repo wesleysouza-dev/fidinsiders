@@ -10,7 +10,9 @@ $(function(){
 
     /* Mask inputs */
     $(".mask-date").mask("99/99/9999")
+    $(".mask-date-card").mask("99/9999")
     $(".mask-cnpj").mask("99.999.999/9999-99")
+    $(".mask-credit-card").mask("9999 9999 9999 9999")
 
     $(document).on('focus', '.mask-cnpj', function(){
         $(this).mask('99.999.999/9999-99')

@@ -1,0 +1,50 @@
+E-mail: wesley.ribeiro.souza@hotmail.com
+Token: 707CEA0F2A82488D8C83605FAB0C8786
+
+
+#AMBIENTES DISPONIVEIS
+
+Produção	https://api.pagseguro.com
+Sandbox	https://sandbox.api.pagseguro.com
+Produção (com autenticação mTLS)	https://secure.api.pagseguro.com/
+Sandbox (com autenticação mTLS)	https://secure.sandbox.api.pagseguro.com/
+
+#CHAVE PUBLICA AMBIENTE SANDBOX
+
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB
+
+
+#CARTAO DE TESTE
+
+Cartão	Bandeira	Comportamento
+Número: 4111111111111111
+Cód. Seg.:123
+Data Exp.:12/2026	VISA	Autorização bem sucedida
+
+Número: 4242424242424242
+Cód. Seg.:123
+Data Exp.:12/2026	VISA	Autorização negada
+
+Número: 5454555555555555
+Cód. Seg.:123
+Data Exp.:12/2026	MASTERCARD	Autorização bem sucedida
+
+Número: 5454545454545454
+Cód. Seg.:123
+Data Exp.:12/2026	MASTERCARD	Autorização negada
+
+Número: 378282246310005
+Cód. Seg.:1234
+Data Exp.:12/2026	AMERICAN EXPRESS	Autorização bem sucedida
+
+Número: 34343434343434
+Cód. Seg.:1234
+Data Exp.:12/2026	AMERICAN EXPRESS	Autorização bem sucedida
+
+Número: 3841001111222233334
+Cód. Seg.:123
+Data Exp.:12/2026	HIPER	Autorização bem sucedida
+
+Número: 6550000000000001
+Cód. Seg.:123
+Data Exp.:12/2026	ELO	Autorização bem sucedida

@@ -1,3 +1,38 @@
+<?php
+    //Incluir o arquivo de configuração
+    require_once('pagseguro/config.php');
+    require_once('pagseguro/utils.php');
+?>
+<?php 
+        $params = array(
+            'email' => $PAGSEGURO_EMAIL,
+            'token' => $PAGSEGURO_TOKEN
+        );
+        $header = array();
+        $status_pagseguro = false;
+        $sessionCode = false;
+
+        $response = curlExec($PAGSEGURO_API_URL."/sessions", $params, $header);
+        print_r($response);
+
+        if ($response && $response !== 'Unauthorized') {
+            $json = json_decode(json_encode(simplexml_load_string($response)));
+
+            if ($json) {
+                $sessionCode = $json->id;
+                print_r($json);
+                $status_pagseguro = true;
+            }
+            
+        }
+        
+        
+
+        
+        print_r($status_pagseguro);
+        
+        
+    ?>
 <main class="bg-body-2-images py-5 bg-white d-flex align-items-center">
     <div class="container">
         <?php 
@@ -8,7 +43,7 @@
         <div class="row">
             <div class="col-12 col-lg-8 my-5">
                 <div class="card">
-                    <div class="card-header p-5">
+                    <div class="card-header p-3 p-lg-5">
                         <div class="pt-4 pl-2 pr-2 pb-2">
                             <ul role="tablist" class="nav nav-pills rounded nav-fill mb-3">
                                 <li class="nav-item"> 
@@ -26,18 +61,25 @@
                         </div>
                         <div class="tab-content">
                             <div id="credit-card" class="tab-pane fade show active pt-3">
-                                <form role="form" onsubmit="event.preventDefault()">
+                                <form role="form" action="pagseguro/payment.php" method="post" onsubmit="event.preventDefault()" id="payment-form">
+                                    <!-- inputs hidden | Apagar amount após teste, o valor deverá ser inserido direto, sem input -->
+                                    <input type="hidden" name="brand">
+                                    <input type="hidden" name="token">
+                                    <input type="hidden" name="senderHash">
+                                    <!-- <input type="hidden" name="amount" value="209.99"> -->
+                                    <!-- fim input hidden -->
+
                                     <div class="form-group"> 
                                         <label>
-                                            <h6>Nome do Títular</h6>
+                                            <h6>Nome do Títular*</h6>
                                         </label> 
-                                        <input type="text" name="" placeholder="Nome descrito no cartão" required class="form-control"> 
+                                        <input type="text" name="cardHolder" placeholder="Nome descrito no cartão" id="titular" class="form-control" value="teste teste"> 
                                     </div>
                                     <div class="form-group"> <label for="cardNumber">
-                                            <h6>Número do cartão</h6>
+                                            <h6>Número do cartão*</h6>
                                         </label>
                                         <div class="input-group"> 
-                                            <input type="text" name="cardNumber" placeholder="Apenas número" class="form-control" required>
+                                            <input type="text" name="cardNumber" placeholder="Apenas número" class="form-control mask-credit-card" required value="4111 1111 1111 1111">
                                             <div class="input-group-append"> 
                                                 <span class="input-group-text text-muted"> <i class="bi bi-credit-card-2-front mx-1"></i>
                                                 <i class="bi bi-credit-card-2-back mx-1"></i>
@@ -46,24 +88,43 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-4">
+                                        <div class="col-12 col-lg-4">
                                             <div class="form-group"> 
                                                 <label>
                                                     <span class="hidden-xs">
-                                                        <h6>Data de Vencimento</h6>
+                                                        <h6>Selecione a Parcela*</h6>
                                                     </span>
                                                 </label>
-                                               <input type="text" placeholder="Mes/Ano" name="" class="form-control" required>
+                                               <select name="installments" class="form-control"  id="select-installments" required>
+                                                   <option value="null">Aguardando cartão...</option>
+                                                </select>
+                                                <input type="hidden" name="installmentValue">
+                                                <div class="mt-2" style="display:none" id="loading-installments">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                    <small>aguarde, carregando parcelas...</small>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-12 col-lg-4">
+                                            <div class="form-group"> 
+                                                <label>
+                                                    <span class="hidden-xs">
+                                                        <h6>Data de Vencimento*</h6>
+                                                    </span>
+                                                </label>
+                                               <input type="text" placeholder="Mes/Ano" name="dueDate" class="form-control mask-date-card" required value="12/2026">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-4">
                                             <div class="form-group mb-4">
                                                 <label data-toggle="tooltip" title="Código de 3 dígitos no verso do cartão">
-                                                    <h6>CVV 
+                                                    <h6>CVV*
                                                         <i class="bi bi-question-circle-fill d-inline"></i>
                                                     </h6>
                                                 </label> 
-                                                <input type="text" required class="form-control"> 
+                                                <input type="text" required name="cvv" class="form-control" value="123"> 
                                             </div>
                                         </div>
                                     </div>
@@ -251,8 +312,23 @@
                 <div class="buttons-group d-inline-block d-md-flex flex-wrap mt-4">
                     <button type="button" onclick="window.location.href='4.5-cadastro'" class="btn bg-white border-black fs-24 fw-600 color-black w-100 py-3 my-2 px-5 ml-0 w-auto">VOLTAR</button>
 
-                    <button type="submit" class="btn bg-black fs-24 fw-600 color-white w-100 py-3 my-2 px-5 w-auto ml-md-4">CONFIRMAR PAGAMENTO</button>
+                    <button type="button" class="btn bg-black fs-24 fw-600 color-white w-100 py-3 my-2 px-5 w-auto ml-md-4" id="payment-confirm">CONFIRMAR PAGAMENTO</button>
                 </div>
             </div>
         </div>
 </main>
+
+
+<?php $scriptFooter = '
+<script>
+ var PROJECT_ID = 2
+ var AMOUNT = 150
+ var SESSION_CODE = "'.$sessionCode.'"
+ var STATUS_PAGAMENTO = ["Aguardando pagamento","Em análise","Paga","Disponível","Em disputa","Devolvida","Cancelada"]
+ var LOADING_INSTALLMENTS = $("#loading-installments")
+</script>
+<script type="text/javascript" src="'.$JS_FILE_URL.'"></script>
+<script src="assets/js/payments.js"></script>'; 
+?>
+
+<!-- <script src="https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js"></script> -->
