@@ -251,7 +251,7 @@ function setValueInstallments(installments,thiss) {
 function sendPaymentAjax(data) {
     console.log('Data', data)
     $.ajax({
-        url: "./pagseguro/payment.php", 
+        url: "./pagseguro/payment-curl.php", 
         type: "POST",
         method: "post",
         dataType: "json",
