@@ -245,7 +245,6 @@ function setValueInstallments(installments,thiss) {
     $("input[name='installmentValue']").val(installments[$(thiss).val()-1].installmentAmount);
 }
 
-
 /* SEND PAYMENTS AJAX */
 
 function sendPaymentAjax(data) {
