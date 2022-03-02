@@ -72,6 +72,9 @@ function loadFieldsByCnpj(data) {
 /* Populated fields by Zipcode */
 function loadFieldsByZipcode(data) {
     $('#endereco').val(data?.logradouro + ', ' + data?.bairro)
+    $('#endereco-boleto').val(data?.logradouro)
+    $('#bairro').val(data?.bairro)
+    $('#bairro-boleto').val(data?.bairro)
     $('#cidade').val(data?.localidade)
     $('#complemento').val(data?.complemento)
     $('select#estado option[value="' + data?.uf + '"]').prop('selected', true)
@@ -160,7 +163,20 @@ function paymentCreditCard() {
 
                 var senderHash = PagSeguroDirectPayment.getSenderHash();
                 $("input[name='senderHash']").val(senderHash);
-                const data = { "token": token, "senderHash": senderHash, "amount": AMOUNT, "installmentValue": installmentValue, "installments": installments }
+
+                const fields = {
+                    publicKey: PUBLIC_KEY_PAGSEGURO,
+                    "holder" : cardHolder,
+                    "number": cardNumber,
+                    "expMonth": dueDate[0],
+                    "expYear": dueDate[1], 
+                    "securityCode": cvv
+                }
+
+                const cardToken = PagSeguro.encryptCard(fields);
+
+                const data = { "token": token, "senderHash": senderHash, "cardToken": cardToken, "amount": AMOUNT, "installmentValue": installmentValue, "installments": installments, "type": 'CARTAO' }
+                
                 sendPaymentAjax(data)
             }, error: function(json){
                 console.log('error paymentCreditCard', json.errors);
@@ -172,8 +188,34 @@ function paymentCreditCard() {
             }
         }
 
-        PagSeguroDirectPayment.createCardToken(param);
+        PagSeguroDirectPayment.createCardToken(param)
     }
+}
+
+/* PAYMENT BANK_SLIP - BOLETO */
+function paymentBankSlip() {
+    const fields = ['nome', 'email', 'cpf', 'cep', 'endereco', 'numero', 'bairro', 'cidade', 'estado']
+    const form = $('#form-boleto')
+
+    const name = form.find("input[name='nome']").val()
+    const tax_id = form.find("input[name='cpf']").val()
+    const email = form.find("input[name='email']").val()
+
+    const regionCode = form.find("select[name='estado']").val()
+    const city = form.find("input[name='cidade']").val()
+    const postal_code = form.find("input[name='cep']").val()
+    const street = form.find("input[name='endereco']").val()
+    const number = form.find("input[name='numero']").val()
+    const locality = form.find("input[name='bairro']").val()
+
+    if (name == '' || tax_id == '' || email == '' || regionCode == '' || city == '' || postal_code == '' || street == '' || number == '' || locality == '' ) {
+        toastNotification('Atenção', 'error', 'Preencha todos os campos do boleto para prosseguir!')
+        return false
+    }
+
+    const data = { "name": name, "tax_id": tax_id, "email": email, "regionCode": regionCode, "city": city, "postal_code": postal_code, "street": street, "number": number,"locality": locality, "type": 'BOLETO' }
+
+    sendPaymentAjax(data,'Boleto')
 }
 
 /* GET INSTALLMENTS CREDIT CARD */
@@ -240,55 +282,117 @@ function getInstallments(){
 /* SET VALUE INSTALLMENTS */
 
 function setValueInstallments(installments,thiss) {
-    console.log('thiss', thiss)
-    console.log(installments[$(thiss).val()-1]);
     $("input[name='installmentValue']").val(installments[$(thiss).val()-1].installmentAmount);
 }
 
 /* SEND PAYMENTS AJAX */
 
-function sendPaymentAjax(data) {
+function sendPaymentAjax(data, type = 'Cartão') {
     console.log('Data', data)
-    $.ajax({
-        url: "./pagseguro/payment-curl.php", 
-        type: "POST",
-        method: "post",
-        dataType: "json",
-        data
-    }).done((data) => {
-        console.log('done', data)
-        const length = Object.keys(data).length
-        if (length > 0) {
-            if (data?.status === 'failed') {
-               return toastNotification('Aviso', 'error', data?.responseText)
-            }
 
-            if (data?.status === '1') {
-                return toastNotification('Status Pagamento: '+ STATUS_PAGAMENTO[parseInt(data?.status)] + '', 'warning', 'O sistema está analisando seu pagamento.')
-            }
+    const btnConfirmPayment = $('#payment-confirm')
+    const loader = $('#loader-confirm-payment')
 
-            if (data?.status === '2') {
-                return toastNotification('Status Pagamento: '+ STATUS_PAGAMENTO[parseInt(data?.status)] + '', 'warning', 'Estamos analisando a transação, atualizaremos automaticamente quando finalizar.')
-            }
+    if (type === 'Cartão') {
 
-            if (data?.status === '3') {
-                return toastNotification('Status Pagamento: '+ STATUS_PAGAMENTO[parseInt(data?.status)] + '', 'success', 'O pagamento foi realizado com sucesso!.')
+        $.ajax({
+            url: "./pagseguro/payment-curl.php", 
+            type: "POST",
+            method: "post",
+            dataType: "json",
+            data,
+            beforeSend: function() {
+                $(btnConfirmPayment).attr('disabled', true)
+                $(loader).show()
             }
+        }).done((data) => {
+            console.log('done', data)
+            const length = Object.keys(data).length
 
-            if (data?.status === '7') {
-                return toastNotification('Status Pagamento: '+ STATUS_PAGAMENTO[parseInt(data?.status)] + '', 'success', 'O pagamento foi cancelado, contate o administrador do sistema!')
+            if (length > 0) {
+                //verifica se o pagseguro retornou erro
+                if (data?.error_messages && data?.error_messages.length > 0) {
+                    const msg = data.error_messages
+                    return toastNotification('Erro ao processar pagamento | Cod ' + msg[0].code, 'error', msg[0].message)
+                }
+                //fim | verifica se o pagseguro retornou erro
+
+                //se deu sucesso
+                if (data.status === 'AUTHORIZED' || data.status === 'PAID') {
+                    $('#payment-form')[0].reset()
+                    return toastNotification('Status Pagamento: '+ data?.payment_response?.message + '', 'success', 'O pagamento foi realizado com sucesso!')
+                }
+
+                if (data?.message === 'Unauthorized') {
+                    return toastNotification('Aviso', 'error', 'Pagamento não autorizado! Contate o administrador do Sistema.')
+                }
+
+                return toastNotification('Status Pagamento: Não identificado', 'warning', 'Contate o adminsitrador do Sistema.')
+            } else {
+                toastNotification('Aviso', 'error', 'Erro Interno ao realizar pagamento, contate o administrador do site!')
             }
-
-            return toastNotification('Status Pagamento: '+ STATUS_PAGAMENTO[parseInt(data?.status)] + '', 'success', '')
-        } else {
+        }).fail((data) => {
+            console.log('fail', data)
             toastNotification('Aviso', 'error', 'Erro Interno ao realizar pagamento, contate o administrador do site!')
-        }
-     })
-     .fail((data) => {
-         console.log('fail', data)
-         toastNotification('Aviso', 'error', 'Erro Interno ao realizar pagamento, contate o administrador do site!')
-     })
-     .always((data) => {
-         console.log( "finished" );
-     });
+        })
+        .always((data) => {
+            console.log( "finished" );
+            $(btnConfirmPayment).attr('disabled', false)
+            $(loader).hide()
+        });
+
+    } else if (type === 'Boleto') {
+        
+        $.ajax({
+            url: "./pagseguro/payment-curl.php", 
+            type: "POST",
+            method: "post",
+            dataType: "json",
+            data,
+            beforeSend: function() {
+                $(btnConfirmPayment).attr('disabled', true)
+                $(loader).show()
+            }
+        }).done((data) => {
+            console.log('done boleto', data)
+            const length = Object.keys(data).length
+
+            if (length > 0) {
+
+                if (data?.status == 'failed') {
+                    return toastNotification('Erro ao gerar boleto', 'error', data?.responseText)
+                }
+                
+                const response = JSON.parse(data)
+               
+                //verifica se o pagseguro retornou erro
+                if (response?.error_messages && response?.error_messages.length > 0) {
+                    const msg = response.error_messages
+                    return toastNotification('Erro ao processar pagamento | Cod ' + msg[0].code, 'error', msg[0].message)
+                }
+                //fim | verifica se o pagseguro retornou erro
+
+                 //se deu sucesso
+                if (response.status === 'AUTHORIZED' || response.status === 'WAITING') {
+                    $('#form-boleto')[0].reset()
+                    return toastNotification('Status Pagamento: '+ response?.payment_response?.message + '', 'success', 'O boleto foi gerado com sucesso! Confira em seu e-mail!')
+                }
+
+                if (response?.message === 'Unauthorized') {
+                    return toastNotification('Aviso', 'error', 'Pagamento não autorizado! Contate o administrador do Sistema.')
+                }
+
+            } else {
+                toastNotification('Aviso', 'error', 'Erro Interno ao gerar o boleto, contate o administrador do site!')
+            }
+        }).fail((data) => {
+            console.log('fail', data)
+            toastNotification('Aviso', 'error', 'Erro Interno ao gerar o boleto, contate o administrador do site!')
+        })
+        .always((data) => {
+            console.log( "finished boleto" );
+            $(btnConfirmPayment).attr('disabled', false)
+            $(loader).hide()
+        });
+    }
 }

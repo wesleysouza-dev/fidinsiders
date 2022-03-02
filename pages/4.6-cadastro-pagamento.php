@@ -130,61 +130,69 @@
                                     </div>
                                 </form>
                             </div>
-                        
                        
                             <div id="ticket" class="tab-pane fade pt-3">
-                                <form role="form" onsubmit="event.preventDefault()">
+                                <form role="form" onsubmit="event.preventDefault()" id="form-boleto">
                                     <div class="row">
-                                        <div class="col-12 col-lg-6">
+                                        <div class="col-12">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Nome completo</h6>
+                                                    <h6>Nome completo*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="nome" placeholder="" required class="form-control"> 
                                             </div>
                                         </div>
                                         <div class="col-12 col-lg-6">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>E-mail para envio de boleto</h6>
+                                                    <h6>E-mail para envio de boleto*</h6>
                                                 </label> 
-                                                <input type="email" name="" placeholder="" required class="form-control"> 
+                                                <input type="email" name="email" placeholder="" required class="form-control"> 
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <div class="form-group"> 
+                                                <label>
+                                                    <h6>CPF*</h6>
+                                                </label> 
+                                                <input type="text" name="cpf" placeholder="" required class="form-control mask-cpf"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-3">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>CEP</h6>
+                                                    <h6>CEP*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="cep" placeholder="" required class="form-control mask-cep" id="cep"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-9">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Endereço</h6>
+                                                    <h6>Endereço*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="endereco" id="endereco-boleto" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-3">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Número</h6>
+                                                    <h6>Número*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="numero" id="numero" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-5">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Bairro</h6>
+                                                    <h6>Bairro*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="bairro" id="bairro-boleto" required class="form-control"> 
                                             </div>
                                         </div>
 
@@ -193,25 +201,25 @@
                                                 <label>
                                                     <h6>Complemento</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="complemento" placeholder="" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-6">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Cidade</h6>
+                                                    <h6>Cidade*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="cidade" id="cidade" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-6">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Estado</h6>
+                                                    <h6>Estado*</h6>
                                                 </label> 
-                                                <select class="form-control" name="estado" required>
+                                                <select class="form-control" name="estado" required id="estado">
                                                     <option value="AC">Acre</option>
                                                     <option value="AL">Alagoas</option>
                                                     <option value="AP">Amapá</option>
@@ -310,9 +318,16 @@
 
             <div class="col-12">
                 <div class="buttons-group d-inline-block d-md-flex flex-wrap mt-4">
-                    <button type="button" onclick="window.location.href='4.5-cadastro'" class="btn bg-white border-black fs-24 fw-600 color-black w-100 py-3 my-2 px-5 ml-0 w-auto">VOLTAR</button>
+                    <button type="button" onclick="window.location.href='4.5-cadastro'" class="btn bg-white border-black fs-22 fw-600 color-black w-100 py-3 my-2 px-5 ml-0 w-auto">VOLTAR</button>
 
-                    <button type="button" class="btn bg-black fs-24 fw-600 color-white w-100 py-3 my-2 px-5 w-auto ml-md-4" id="payment-confirm">CONFIRMAR PAGAMENTO</button>
+                    <button type="button" class="btn bg-black fs-22 fw-600 color-white w-100 py-3 my-2 px-5 w-auto ml-md-4 d-flex align-items-center" id="payment-confirm">
+                        <span>CONFIRMAR PAGAMENTO</span>
+                        <div class="spinner-border spinner-border-sm ml-3" id="loader-confirm-payment" role="status" style="display: none">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </button>
+
+                    
                 </div>
             </div>
         </div>
@@ -326,8 +341,12 @@
  var SESSION_CODE = "'.$sessionCode.'"
  var STATUS_PAGAMENTO = ["Aguardando pagamento","Em análise","Paga","Disponível","Em disputa","Devolvida","Cancelada"]
  var LOADING_INSTALLMENTS = $("#loading-installments")
+ var PAYMENT = "cartao"
+ 
+ var PUBLIC_KEY_PAGSEGURO = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB"
 </script>
 <script type="text/javascript" src="'.$JS_FILE_URL.'"></script>
+<script src="https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js"></script>
 <script src="assets/js/payments.js"></script>'; 
 ?>
 

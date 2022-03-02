@@ -1,87 +1,171 @@
 <?php header('Content-Type: application/json; charset=utf-8');
 require_once('config.php');
 
+  $type = null;
 
+  if (isset($_POST['type'])) {
+    $type = $_POST['type'];
+  } else {
+    echo json_encode(['status' => 'failed', 'responseText' => 'Tipo de Pagamento não informado, contate o administrador do sistema!']);
+    return false;
+  }
+
+
+  if ($type === 'CARTAO') {
+    
+    /* CARTAO DE CRÉDITO */
     $creditCardToken = null;
     $senderHash = null;
+    $cardToken = null;
     $itemAmount =  null;
     $installmentValue = null;
     $installmentsQty = null;
 
-    // if (isset($_POST['token'])) {
-    //     $creditCardToken = (htmlspecialchars($_POST["token"]));
-    // }
+    if (isset($_POST['token'])) {
+        $creditCardToken = (htmlspecialchars($_POST["token"]));
+    }
 
-    // if (isset($_POST['senderHash'])) {
-    //     $senderHash = (htmlspecialchars($_POST["senderHash"]));
-    // }
+    if (isset($_POST['senderHash'])) {
+        $senderHash = (htmlspecialchars($_POST["senderHash"]));
+    }
+
+    if (isset($_POST['cardToken'])) {
+      $cardToken = $_POST["cardToken"]["encryptedCard"];
+    }
     
-    // if (isset($_POST['amount'])) {
-    //     $itemAmount = number_format($_POST["amount"], 2, '.', '');
-    // }
+    if (isset($_POST['amount'])) {
+        $itemAmount = number_format($_POST["amount"], 2, '.', '');
+        $itemAmount = str_replace(array('.',','),'',$itemAmount);
+    }
     
-    // if (isset($_POST['installmentValue'])) {
-    //     $installmentValue = number_format($_POST["installmentValue"], 2, '.', '');
-    // }
+    if (isset($_POST['installmentValue'])) {
+        $installmentValue = number_format($_POST["installmentValue"], 2, '.', '');
+    }
     
-    // if (isset($_POST['installments'])) {
-    //     $installmentsQty = $_POST["installments"];
-    // }
+    if (isset($_POST['installments'])) {
+        $installmentsQty = $_POST["installments"];
+    }
     
 
-    // if ($creditCardToken === null || $senderHash === null || $itemAmount === null || $installmentsQty === null || $installmentValue === null) {
-    //     echo json_encode(['status' => 'failed', 'responseText' => 'Dados incompletos para realizar pagamento. Contate o administrador do sistema!']);
-    //     return false;
-    // }
+    if ($creditCardToken === null || $senderHash === null || $itemAmount === null || $installmentsQty === null || $installmentValue === null) {
+        echo json_encode(['status' => 'failed', 'responseText' => 'Dados incompletos para realizar pagamento. Contate o administrador do sistema!']);
+        return false;
+    }
+    
+    $ch = curl_init();
 
+    curl_setopt($ch, CURLOPT_URL, $URL_PAYMENT_CC);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, "{\n  \"reference_id\": \"ex-00001\",\n  \"description\": \"Sistema Fidinsiders\",\n  \"amount\": {\n    \"value\": $itemAmount,\n    \"currency\": \"BRL\"\n  },\n  \"payment_method\": {\n    \"type\": \"CREDIT_CARD\",\n    \"installments\": $installmentsQty,\n    \"capture\": true,\n    \"card\": {\n      \"encrypted\": \"$cardToken\"\n    }\n  }\n}");
 
-$ch = curl_init();
+    $headers = array();
+    $headers[] = 'Authorization: '.$PAGSEGURO_TOKEN.'';
+    $headers[] = 'Content-Type: application/json';
+    $headers[] = 'X-Api-Version: 4.0';
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-curl_setopt($ch, CURLOPT_URL, 'https://sandbox.api.pagseguro.com/charges');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, '{"reference_id": "ex-00001",
-    "description": "Wesley Teste Postman2",
-    "amount": {
-      "value": 5000,
-      "currency": "BRL"
-    },
-    "payment_method": {
-      "type": "CREDIT_CARD",
-      "installments": 1,
-      "capture": false,
-      "soft_descriptor": "Site Fidinsiders",
-      "card": {
-        "number": "1156161616",
-        "exp_month": "03",
-        "exp_year": "2026",
-        "security_code": "123",
-        "holder": {
-            "name": "Jose da Silva"
-        }
-      }
-    },
-    "notification_urls": [
-      "https://yourserver.com/nas_ecommerce/277be731-3b7c-4dac-8c4e-4c3f4a1fdc46/"
-    ],
-    "metadata": {
-        "Exemplo": "Aceita qualquer informação",
-      "NotaFiscal": "123",
-      "idComprador": "123456"
-    }}');
-
-$headers = array();
-$headers[] = 'Authorization: '.$PAGSEGURO_TOKEN.'';
-$headers[] = 'Content-Type: application/json';
-$headers[] = 'X-Api-Version: 4.0';
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-    echo 'Error:' . curl_error($ch);
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+        echo 'Error:' . curl_error($ch);
+        curl_close($ch);
+        return;
+    }
+    echo($result);
     curl_close($ch);
-    return;
-}
-echo($result);
-curl_close($ch);
+    
+  } else if ($type === 'BOLETO') {
+
+    /* BOLETO BANCARIO */
+
+    $today = date('Y-m-d');
+    $due_date = date('Y-m-d', strtotime("+3 days", strtotime($today))); //soma mais 3 dias para vencer boleto
+
+    $name = '';
+    $tax_id = '';
+    $email = '';
+    $regionCode = '';
+    $city = '';
+    $postal_code = '';
+    $street = '';
+    $number = '';
+    $locality = '';
+
+    $country = "Brasil";
+
+
+    if (isset($_POST['name'])) {
+      $name = (htmlspecialchars($_POST["name"]));
+    }
+
+    if (isset($_POST['tax_id'])) {
+      $found = ['.', '-'];
+      $tax_id = str_replace($found, '', (htmlspecialchars($_POST["tax_id"])));
+    }
+
+    if (isset($_POST['email'])) {
+      $email = (htmlspecialchars($_POST["email"]));
+    }
+
+    if (isset($_POST['regionCode'])) {
+      $regionCode = htmlspecialchars($_POST["regionCode"]);
+    }
+
+    if (isset($_POST['city'])) {
+      $city = (htmlspecialchars($_POST["city"]));
+    }
+
+    if (isset($_POST['postal_code'])) {
+      $postal_code = str_replace('-', '', htmlspecialchars($_POST["postal_code"]));
+    }
+
+    if (isset($_POST['street'])) {
+      $street = (htmlspecialchars($_POST["street"]));
+    }
+
+    if (isset($_POST['number'])) {
+      $number = (htmlspecialchars($_POST["number"]));
+    }
+
+    if (isset($_POST['locality'])) {
+      $locality = (htmlspecialchars($_POST["locality"]));
+    }
+
+    if ($name == '' || $tax_id == '' || $email == '' || $regionCode == '' || $city == '' || $postal_code == '' || $street == '' || $number == '' || $locality == '') {
+      echo json_encode(['status' => 'failed', 'responseText' => 'Dados incompletos para realizar pagamento. Preencha todos os campos obrigatório para prosseguir!']);
+      return false;
+
+    } else {
+      $price = 1000;
+
+      // Generated by curl-to-PHP: http://incarnate.github.io/curl-to-php/
+      $ch = curl_init();
+
+      curl_setopt($ch, CURLOPT_URL, $URL_PAYMENT_CC);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_POST, 1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, "{\n  \"reference_id\": \"ex-00001\",\n  \"description\": \"Pagamento Boleto - Projeto Fidinsiders\",\n  \"amount\": {\n    \"value\": $price,\n    \"currency\": \"BRL\"\n  },\n  \"payment_method\": {\n    \"type\": \"BOLETO\",\n    \"boleto\": {\n      \"due_date\": \"$due_date\",\n      \"instruction_lines\": {\n        \"line_1\": \"Pagamento processado para DESC Fatura\",\n        \"line_2\": \"Via PagSeguro\"\n      },\n      \"holder\": {\n        \"name\": \"$name\",\n        \"tax_id\": \"$tax_id\",\n        \"email\": \"$email\",\n        \"address\": {\n          \"country\": \"$country\",\n          \"region\": \"$regionCode\",\n          \n          \"region_code\": \"$regionCode\",          \n\"city\": \"$city\",\n          \"postal_code\": \"$postal_code\",\n          \"street\": \"$street\",\n          \"number\": \"$number\",\n          \"locality\": \"$locality\"\n        }\n      }\n    }\n  },\n  \"notification_urls\": [\n    \"https://yourserver.com/nas_ecommerce/277be731-3b7c-4dac-8c4e-4c3f4a1fdc46/\"\n  ]\n}");
+
+      $headers = array();
+      $headers[] = 'Authorization: '.$PAGSEGURO_TOKEN.'';
+      $headers[] = 'Content-Type: application/json';
+      $headers[] = 'X-Api-Version: 4.0';
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+      $result = curl_exec($ch);
+      if (curl_errno($ch)) {
+          echo 'Error:' . curl_error($ch);
+          echo json_encode(['status' => 'failed', 'responseText' => 'Falha ao gerar boleto, contate o administrador do sistema!']);
+          return false;
+      }
+      curl_close($ch);
+      echo json_encode($result);
+    }
+
+  }
+
+    
+
+
+
 

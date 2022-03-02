@@ -4,7 +4,7 @@ var installments = [];
     
 $("input[name='cardNumber']").keyup(function(){
     if ($(this).val().replace(/[^\d]+/g,'').length === 16) {
-        console.log('cardNumber Request')
+        // console.log('cardNumber Request')
         getInstallments();
     } else {
         $('#select-installments').html('<option value="null">Aguardando cartão...</option>')
@@ -47,10 +47,16 @@ const paymentForm = $('#payment-form')
 const paymentConfirm = $('#payment-confirm')
 
 $(paymentConfirm).on('click', function() {
-    const validate = validateCreditCard()
 
-    if (validate) {
-        paymentCreditCard()
+    if (PAYMENT === 'Boleto') {
+        paymentBankSlip()
+    } else if (PAYMENT === 'Cartão de Crédito') {
+        const validate = validateCreditCard()
+
+        if (validate) {
+            paymentCreditCard()
+        }
     }
+    
     // $(paymentForm).submit()
 })
