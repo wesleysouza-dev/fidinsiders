@@ -10,7 +10,10 @@ $(function(){
 
     /* Mask inputs */
     $(".mask-date").mask("99/99/9999")
+    $(".mask-date-card").mask("99/9999")
     $(".mask-cnpj").mask("99.999.999/9999-99")
+    $(".mask-cpf").mask("999.999.999-99")
+    $(".mask-credit-card").mask("9999 9999 9999 9999")
 
     $(document).on('focus', '.mask-cnpj', function(){
         $(this).mask('99.999.999/9999-99')
@@ -258,6 +261,14 @@ $(function(){
         $(this).find('input').prop('checked', true)
         $(groupVoteItem).removeClass('selected')
         $(this).addClass('selected')
+    })
+
+
+    /* Tabs Payment */
+    $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+        PAYMENT = $(e.target).text().trim()
+        console.log(PAYMENT)
+        //e.relatedTarget // previous active tab
     })
 
 })

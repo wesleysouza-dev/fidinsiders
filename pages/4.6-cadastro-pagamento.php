@@ -1,3 +1,38 @@
+<?php
+    //Incluir o arquivo de configuração
+    require_once('pagseguro/config.php');
+    require_once('pagseguro/utils.php');
+?>
+<?php 
+        $params = array(
+            'email' => $PAGSEGURO_EMAIL,
+            'token' => $PAGSEGURO_TOKEN
+        );
+        $header = array();
+        $status_pagseguro = false;
+        $sessionCode = false;
+
+        $response = curlExec($PAGSEGURO_API_URL."/sessions", $params, $header);
+        print_r($response);
+
+        if ($response && $response !== 'Unauthorized') {
+            $json = json_decode(json_encode(simplexml_load_string($response)));
+
+            if ($json) {
+                $sessionCode = $json->id;
+                print_r($json);
+                $status_pagseguro = true;
+            }
+            
+        }
+        
+        
+
+        
+        print_r($status_pagseguro);
+        
+        
+    ?>
 <main class="bg-body-2-images py-5 bg-white d-flex align-items-center">
     <div class="container">
         <?php 
@@ -8,7 +43,7 @@
         <div class="row">
             <div class="col-12 col-lg-8 my-5">
                 <div class="card">
-                    <div class="card-header p-5">
+                    <div class="card-header p-3 p-lg-5">
                         <div class="pt-4 pl-2 pr-2 pb-2">
                             <ul role="tablist" class="nav nav-pills rounded nav-fill mb-3">
                                 <li class="nav-item"> 
@@ -26,18 +61,25 @@
                         </div>
                         <div class="tab-content">
                             <div id="credit-card" class="tab-pane fade show active pt-3">
-                                <form role="form" onsubmit="event.preventDefault()">
+                                <form role="form" action="pagseguro/payment.php" method="post" onsubmit="event.preventDefault()" id="payment-form">
+                                    <!-- inputs hidden | Apagar amount após teste, o valor deverá ser inserido direto, sem input -->
+                                    <input type="hidden" name="brand">
+                                    <input type="hidden" name="token">
+                                    <input type="hidden" name="senderHash">
+                                    <!-- <input type="hidden" name="amount" value="209.99"> -->
+                                    <!-- fim input hidden -->
+
                                     <div class="form-group"> 
                                         <label>
-                                            <h6>Nome do Títular</h6>
+                                            <h6>Nome do Títular*</h6>
                                         </label> 
-                                        <input type="text" name="" placeholder="Nome descrito no cartão" required class="form-control"> 
+                                        <input type="text" name="cardHolder" placeholder="Nome descrito no cartão" id="titular" class="form-control" value="teste teste"> 
                                     </div>
                                     <div class="form-group"> <label for="cardNumber">
-                                            <h6>Número do cartão</h6>
+                                            <h6>Número do cartão*</h6>
                                         </label>
                                         <div class="input-group"> 
-                                            <input type="text" name="cardNumber" placeholder="Apenas número" class="form-control" required>
+                                            <input type="text" name="cardNumber" placeholder="Apenas número" class="form-control mask-credit-card" required value="4111 1111 1111 1111">
                                             <div class="input-group-append"> 
                                                 <span class="input-group-text text-muted"> <i class="bi bi-credit-card-2-front mx-1"></i>
                                                 <i class="bi bi-credit-card-2-back mx-1"></i>
@@ -46,84 +88,111 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-4">
+                                        <div class="col-12 col-lg-4">
                                             <div class="form-group"> 
                                                 <label>
                                                     <span class="hidden-xs">
-                                                        <h6>Data de Vencimento</h6>
+                                                        <h6>Selecione a Parcela*</h6>
                                                     </span>
                                                 </label>
-                                               <input type="text" placeholder="Mes/Ano" name="" class="form-control" required>
+                                               <select name="installments" class="form-control"  id="select-installments" required>
+                                                   <option value="null">Aguardando cartão...</option>
+                                                </select>
+                                                <input type="hidden" name="installmentValue">
+                                                <div class="mt-2" style="display:none" id="loading-installments">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                    <small>aguarde, carregando parcelas...</small>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-12 col-lg-4">
+                                            <div class="form-group"> 
+                                                <label>
+                                                    <span class="hidden-xs">
+                                                        <h6>Data de Vencimento*</h6>
+                                                    </span>
+                                                </label>
+                                               <input type="text" placeholder="Mes/Ano" name="dueDate" class="form-control mask-date-card" required value="12/2026">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-4">
                                             <div class="form-group mb-4">
                                                 <label data-toggle="tooltip" title="Código de 3 dígitos no verso do cartão">
-                                                    <h6>CVV 
+                                                    <h6>CVV*
                                                         <i class="bi bi-question-circle-fill d-inline"></i>
                                                     </h6>
                                                 </label> 
-                                                <input type="text" required class="form-control"> 
+                                                <input type="text" required name="cvv" class="form-control" value="123"> 
                                             </div>
                                         </div>
                                     </div>
                                 </form>
                             </div>
-                        
                        
                             <div id="ticket" class="tab-pane fade pt-3">
-                                <form role="form" onsubmit="event.preventDefault()">
+                                <form role="form" onsubmit="event.preventDefault()" id="form-boleto">
                                     <div class="row">
-                                        <div class="col-12 col-lg-6">
+                                        <div class="col-12">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Nome completo</h6>
+                                                    <h6>Nome completo*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="nome" placeholder="" required class="form-control"> 
                                             </div>
                                         </div>
                                         <div class="col-12 col-lg-6">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>E-mail para envio de boleto</h6>
+                                                    <h6>E-mail para envio de boleto*</h6>
                                                 </label> 
-                                                <input type="email" name="" placeholder="" required class="form-control"> 
+                                                <input type="email" name="email" placeholder="" required class="form-control"> 
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <div class="form-group"> 
+                                                <label>
+                                                    <h6>CPF*</h6>
+                                                </label> 
+                                                <input type="text" name="cpf" placeholder="" required class="form-control mask-cpf"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-3">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>CEP</h6>
+                                                    <h6>CEP*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="cep" placeholder="" required class="form-control mask-cep" id="cep"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-9">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Endereço</h6>
+                                                    <h6>Endereço*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="endereco" id="endereco-boleto" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-3">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Número</h6>
+                                                    <h6>Número*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="numero" id="numero" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-5">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Bairro</h6>
+                                                    <h6>Bairro*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="bairro" id="bairro-boleto" required class="form-control"> 
                                             </div>
                                         </div>
 
@@ -132,25 +201,25 @@
                                                 <label>
                                                     <h6>Complemento</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="complemento" placeholder="" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-6">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Cidade</h6>
+                                                    <h6>Cidade*</h6>
                                                 </label> 
-                                                <input type="text" name="" placeholder="" required class="form-control"> 
+                                                <input type="text" name="cidade" id="cidade" required class="form-control"> 
                                             </div>
                                         </div>
 
                                         <div class="col-3 col-lg-6">
                                             <div class="form-group"> 
                                                 <label>
-                                                    <h6>Estado</h6>
+                                                    <h6>Estado*</h6>
                                                 </label> 
-                                                <select class="form-control" name="estado" required>
+                                                <select class="form-control" name="estado" required id="estado">
                                                     <option value="AC">Acre</option>
                                                     <option value="AL">Alagoas</option>
                                                     <option value="AP">Amapá</option>
@@ -249,10 +318,36 @@
 
             <div class="col-12">
                 <div class="buttons-group d-inline-block d-md-flex flex-wrap mt-4">
-                    <button type="button" onclick="window.location.href='4.5-cadastro'" class="btn bg-white border-black fs-24 fw-600 color-black w-100 py-3 my-2 px-5 ml-0 w-auto">VOLTAR</button>
+                    <button type="button" onclick="window.location.href='4.5-cadastro'" class="btn bg-white border-black fs-22 fw-600 color-black w-100 py-3 my-2 px-5 ml-0 w-auto">VOLTAR</button>
 
-                    <button type="submit" class="btn bg-black fs-24 fw-600 color-white w-100 py-3 my-2 px-5 w-auto ml-md-4">CONFIRMAR PAGAMENTO</button>
+                    <button type="button" class="btn bg-black fs-22 fw-600 color-white w-100 py-3 my-2 px-5 w-auto ml-md-4 d-flex align-items-center" id="payment-confirm">
+                        <span>CONFIRMAR PAGAMENTO</span>
+                        <div class="spinner-border spinner-border-sm ml-3" id="loader-confirm-payment" role="status" style="display: none">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </button>
+
+                    
                 </div>
             </div>
         </div>
 </main>
+
+
+<?php $scriptFooter = '
+<script>
+ var PROJECT_ID = 2
+ var AMOUNT = 150
+ var SESSION_CODE = "'.$sessionCode.'"
+ var STATUS_PAGAMENTO = ["Aguardando pagamento","Em análise","Paga","Disponível","Em disputa","Devolvida","Cancelada"]
+ var LOADING_INSTALLMENTS = $("#loading-installments")
+ var PAYMENT = "cartao"
+ 
+ var PUBLIC_KEY_PAGSEGURO = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr+ZqgD892U9/HXsa7XqBZUayPquAfh9xx4iwUbTSUAvTlmiXFQNTp0Bvt/5vK2FhMj39qSv1zi2OuBjvW38q1E374nzx6NNBL5JosV0+SDINTlCG0cmigHuBOyWzYmjgca+mtQu4WczCaApNaSuVqgb8u7Bd9GCOL4YJotvV5+81frlSwQXralhwRzGhj/A57CGPgGKiuPT+AOGmykIGEZsSD9RKkyoKIoc0OS8CPIzdBOtTQCIwrLn2FxI83Clcg55W8gkFSOS6rWNbG5qFZWMll6yl02HtunalHmUlRUL66YeGXdMDC2PuRcmZbGO5a/2tbVppW6mfSWG3NPRpgwIDAQAB"
+</script>
+<script type="text/javascript" src="'.$JS_FILE_URL.'"></script>
+<script src="https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js"></script>
+<script src="assets/js/payments.js"></script>'; 
+?>
+
+<!-- <script src="https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js"></script> -->
